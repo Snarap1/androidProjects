@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import org.w3c.dom.Text
 import java.util.Timer
 import kotlin.concurrent.timerTask
 
@@ -56,7 +57,9 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer.seekTo(seekBar.progress)
 
     }
-    fun nextSong(view: View) {}
+    fun nextSong(view: View) {
+
+    }
     fun pause(view: View) {
         if (mediaPlayer.isPlaying())
         {
