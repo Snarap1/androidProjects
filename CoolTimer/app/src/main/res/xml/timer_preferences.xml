@@ -9,4 +9,18 @@
         android:summaryOn="Sound enabled"
         />
 
+    <ListPreference
+        android:title="timer_sound"
+        android:key="timer_sound"
+        android:defaultValue="bell"
+        android:entries="@array/pref_timer_sound_labels"
+        android:entryValues="@array/pref_timer_sound_values"
+        />
+
+    <EditTextPreference
+        android:title="Default Interval:"
+        android:key="default_interval"
+        android:defaultValue="30"
+        />
+
 </PreferenceScreen>

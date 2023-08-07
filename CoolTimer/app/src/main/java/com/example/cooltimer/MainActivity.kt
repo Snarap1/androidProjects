@@ -2,6 +2,8 @@ package com.example.cooltimer
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,20 +19,27 @@ import android.widget.Toolbar.OnMenuItemClickListener
 import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.MaterialToolbar
+import java.lang.Exception
+import java.lang.NumberFormatException
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
    lateinit var timer:CountDownTimer
     lateinit var seekBar:SeekBar
+    var  defaultInterval:Int = 0
      var isTimerOn:Boolean = false
+    lateinit var sharedPreferences:SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         toolBar()
+        sharedPreferences  = PreferenceManager.getDefaultSharedPreferences(this)
+
 
         seekBar = findViewById(R.id.seekBar)
         seekBar.max = 600
+        setIntervalFromSharedPreference(sharedPreferences)
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
                 seekBar.progress = progress
@@ -41,14 +50,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
-
                 val value = seekBar.progress.toLong() * 1000
                 updateTimer(value)
             }
         })
 
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
+
+
 
     fun startStop(view: View) {
         val btn:Button = findViewById(R.id.start)
@@ -65,12 +75,28 @@ class MainActivity : AppCompatActivity() {
                 }
                 override fun onFinish() {
 
-                    var sharedPreferences =
+                    val sharedPreferences =
                         PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
                     if (sharedPreferences.getBoolean("enable_sound",true)){
-                        val mediaPlayer = MediaPlayer.create(applicationContext,R.raw.bell_sound)
-                        mediaPlayer.start()
+                        val mediaPlayer:MediaPlayer
+                        val melodyName: String = sharedPreferences.getString("timer_sound","bell")!!
+
+                        when{
+                            melodyName.equals("bell")-> {
+                                mediaPlayer = MediaPlayer.create(applicationContext,R.raw.bell_sound)
+                                mediaPlayer.start()
+                            }
+                            melodyName.equals("siren")-> {
+                                mediaPlayer = MediaPlayer.create(applicationContext,R.raw.siren)
+                                mediaPlayer.start()
+                            }
+                            melodyName.equals("bip")-> {
+                                mediaPlayer = MediaPlayer.create(applicationContext,R.raw.bip_sound)
+                                mediaPlayer.start()
+                            }
+                        }
+
                     }
 
 
@@ -115,9 +141,8 @@ class MainActivity : AppCompatActivity() {
 
         timer.cancel()
         seekBar.isVisible = true
-        seekBar.progress = 0
+        setIntervalFromSharedPreference(sharedPreferences)
         btn.text = "start"
-        timerView.text = "00:00"
         isTimerOn =false
     }
 
@@ -128,6 +153,7 @@ class MainActivity : AppCompatActivity() {
         toolbar.inflateMenu(R.menu.timer_menu)
         toolbar.setOnMenuItemClickListener(object : OnMenuItemClickListener,
             androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
+            @SuppressLint("SuspiciousIndentation")
             override fun onMenuItemClick(item: MenuItem?): Boolean {
               val id = item!!.itemId
                if(id == R.id.action_settings){
@@ -146,6 +172,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    private  fun setIntervalFromSharedPreference(sharedPreferences: SharedPreferences){
+        val seekBar: SeekBar = findViewById(R.id.seekBar)
+        val timerView: TextView = findViewById(R.id.timer)
+        defaultInterval = Integer.valueOf(sharedPreferences.getString("default_interval","30"))
+        val defaultIntervalMill:Long = (defaultInterval * 1000).toLong()
+        updateTimer(defaultIntervalMill)
+        seekBar.progress = defaultInterval
+
+    }
+
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
+        if(p1.equals("default_interval")){
+            setIntervalFromSharedPreference(sharedPreferences)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
 }
 
 
