@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_weight="3"
+    android:layout_margin="9dp">
+
+    <TextView
+        android:id="@+id/firstNameTV"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="t1"/>
+
+    <TextView
+        android:id="@+id/lastNameTV"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="t2"/>
+
+    <TextView
+        android:id="@+id/groupTV"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="t3"/>
+
+</androidx.appcompat.widget.LinearLayoutCompat>
